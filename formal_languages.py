@@ -75,7 +75,7 @@ def automation_from_expression(expression: str) -> FiniteAutomation:
             next_state_number += 2  # update counter
         elif symbol == "*":
             edit_automation = stack_of_automation.pop()
-            if edit_automation.start == edit_automation.finish:  # check is it stared before (ex. 1*, (a*)* )
+            if edit_automation.start == edit_automation.finish: 
                 stack_of_automation.append(edit_automation)
                 continue
             finish_to_start_edge = Transition(
@@ -83,12 +83,12 @@ def automation_from_expression(expression: str) -> FiniteAutomation:
                 to_=edit_automation.start,
                 by=''
             )
-            edit_automation.transitions.append(finish_to_start_edge)  # finish -> start
-            edit_automation.finish = edit_automation.start  # finish = start
+            edit_automation.transitions.append(finish_to_start_edge) 
+            edit_automation.finish = edit_automation.start 
             stack_of_automation.append(edit_automation)
         else:
             base_automation = FiniteAutomation()
-            base_automation.states = [next_state_number, next_state_number + 1]  # 2 states
+            base_automation.states = [next_state_number, next_state_number + 1]  
             base_automation.start = next_state_number
             base_automation.finish = next_state_number + 1
             edge = Transition(
@@ -96,8 +96,8 @@ def automation_from_expression(expression: str) -> FiniteAutomation:
                 to_=next_state_number + 1,
                 by=symbol
             )
-            base_automation.transitions = [edge]  # 1 edge: start -> finish by letter
-            next_state_number += 2  # update counter
+            base_automation.transitions = [edge]  
+            next_state_number += 2  
             stack_of_automation.append(base_automation)
     return stack_of_automation.pop()
  
@@ -126,7 +126,7 @@ def remove_empty_transitions(automation: FiniteAutomation) -> FiniteAutomation:
     new_automation.start = automation.start
     new_automation.states = []
  
-    def dfs_for_states(vertex):  # find all reachable states for state vertex
+    def dfs_for_states(vertex): 
         if vertex in new_automation.states:
             return
         new_automation.states.append(vertex)
@@ -134,7 +134,7 @@ def remove_empty_transitions(automation: FiniteAutomation) -> FiniteAutomation:
             if edge.from_ == vertex:
                 dfs_for_states(edge.to_)
  
-    dfs_for_states(new_automation.start)  # all reachable states for start
+    dfs_for_states(new_automation.start)  
     for transition in one_letter_transitions:  # remove extra copies
         if transition.from_ in new_automation.states:
             new_automation.transitions.append(transition)
@@ -158,18 +158,18 @@ def remove_empty_transitions(automation: FiniteAutomation) -> FiniteAutomation:
  
  
 def max_possible_subword(word: str, automation: FiniteAutomation) -> int:
-    global_result = 0  # the max length of subword
+    global_result = 0  
     for length in range(0, len(word)):
  
         result = 0
         states_from_previous_subword = set(automation.states)
-        for symbol in word[length:]: # possггible states for previous subword
-            states_for_this_subword = set()  # possible states for current subword
+        for symbol in word[length:]: 
+            states_for_this_subword = set()  
             for state in states_from_previous_subword:
-                for transition in automation.transitions:  # try to find possible states for current subword
+                for transition in automation.transitions:
                     if transition.from_ == state and transition.by == symbol:
                         states_for_this_subword.add(transition.to_)
-            if len(states_for_this_subword) == 0:  # no state for this subword -- return result
+            if len(states_for_this_subword) == 0:  
                 break
             else:
                 result += 1  # update result
